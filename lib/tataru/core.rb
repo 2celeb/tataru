@@ -80,8 +80,8 @@ module Tataru
     end
     def complete_member_number(url)
       page = @agent.get(url)
-
-      p page.title
+      p page
+      #p page.title
       n = page.search('*[@id="nittei"]').first.search("a").size
       p n
     end
