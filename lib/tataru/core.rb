@@ -21,18 +21,25 @@ module Tataru
     end
 
     def announcement_all_member_complete
-
-      date_key = Time.now.wday > 2 ? next_week_date_key : current_week_date_key
-      url = get_choseisan_url(date_key)
+      url = get_choseisan_url
+      p url
       num = complete_member_number(url)
       puts "num = #{num}"
+      announcement = false
       if num >= 8
+        announcement = true
+        conn = Faraday.new
         conn.post do |req|
           req.url ENV['DISCORD_INCOMMING_URL']
           req.headers['Content-Type'] = 'application/json'
           req.body = {content: "全員の入力が終わりましたでっす"}.to_json
         end
       end
+      announcement
+    end
+
+    def target_week_date_key
+      Time.now.wday > 2 ? next_week_date_key : current_week_date_key
     end
 
     private
@@ -44,8 +51,8 @@ module Tataru
       (Date.today.beginning_of_week + 7.day).to_s
     end
 
-    def get_choseisan_url(date_key)
-      item_output = @table.get_item(key: {date_key: date_key})
+    def get_choseisan_url
+      item_output = @table.get_item(key: {date_key: target_week_date_key})
       if item_output
         item_output.item["url"]
       end
@@ -71,10 +78,12 @@ module Tataru
     def complete_announcement?
       # dynamodbにアナウンス状況を確認する
     end
-
     def complete_member_number(url)
       page = @agent.get(url)
-      page.search('*[@id="nittei"]').first.search("a").size
+
+      p page.title
+      n = page.search('*[@id="nittei"]').first.search("a").size
+      p n
     end
   end
 end
