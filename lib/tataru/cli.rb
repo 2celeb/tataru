@@ -9,5 +9,11 @@ module Tataru
       tataru = Tataru::Core.new
       tataru.post_choseisan
     end
+
+    desc "complete_announcement", "調整さんURL入力確認"
+    def complete_announcement
+      tataru = Tataru::Core.new
+      tataru.announcement_all_member_complete
+    end
   end
 end
