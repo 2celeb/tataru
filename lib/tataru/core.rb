@@ -11,7 +11,7 @@ module Tataru
     def post_choseisan
       url = create_choseisan_url
       current_week_date_key
-      @table.put_item(item: { date_key: next_week_date_key, url: url } )
+      @table.put_item(item: { date_key: target_week_date_key, url: url } )
       mention = ENV['DISCORD_CHOUSEISAN_MENTION_ID'] ? "@#{ENV['DISCORD_CHOUSEISAN_MENTION_ID']} " : ""
       conn = Faraday.new
       conn.post do |req|
@@ -68,8 +68,11 @@ module Tataru
       form.comment = "金土日何時までできるかコメ欄にお願いします。\n例 金土日 454"
       wday_strings = %w(日 月 火 水 木 金 土)
       # ヒカセンの週の開始は火曜日から
-      start_date = (Date.today + 7).beginning_of_week - 1.week + 1.day
-      #start_date = (Date.today + 7).beginning_of_week + 1.day
+      if Time.now.wday > 2
+        start_date = (Date.today + 7).beginning_of_week - 1.week + 1.day
+      else
+        start_date = (Date.today + 7).beginning_of_week + 1.day
+      end
       form.kouho =  (start_date..(start_date + 6)).map {|d| "%02d/%02d(%s) 25:00 〜" % [d.month, d.day, wday_strings[d.wday]]}.join("\n")
       button = form.button_with(id: 'createBtn')
       result_page = @agent.submit(form, button)

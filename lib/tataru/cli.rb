@@ -15,5 +15,11 @@ module Tataru
       tataru = Tataru::Core.new
       tataru.announcement_all_member_complete
     end
+
+    desc "target_week_date_key", "調整さんURL入力確認"
+    def target_week_date_key
+      tataru = Tataru::Core.new
+      puts tataru.target_week_date_key
+    end
   end
 end
